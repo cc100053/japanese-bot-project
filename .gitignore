@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Python
+backend/venv/
+backend/__pycache__/
+backend/.env
+*.pyc
+
+# Backups
+*.bak
+*.bu.py
+*.gemini_backup
+
+# Flutter / Dart
+mobile/japanese_cold_bot/build/
+mobile/japanese_cold_bot/.dart_tool/
+mobile/japanese_cold_bot/.idea/
+mobile/japanese_cold_bot/.flutter-plugins
+mobile/japanese_cold_bot/.flutter-plugins-dependencies

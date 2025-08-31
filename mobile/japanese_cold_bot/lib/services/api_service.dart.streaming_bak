@@ -1,0 +1,98 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+
+class ApiService {
+  // 動態檢測平台，Android 模擬器使用主機 IP，其他使用 localhost
+  // IMPORTANT: Replace 'YOUR_HOST_IP_ADDRESS' with your actual host machine's IP address
+  // if you are running on a physical device or iOS simulator.
+  // For Android emulator, '10.0.2.2' typically works for 'localhost'.
+  // For web, 'localhost' usually works.
+  static const String _hostIpAddress = '192.168.10.127'; // << MODIFIED: Set to backend IP
+
+  static String get baseUrl {
+    if (Platform.isAndroid) {
+      // For Android Emulator, 10.0.2.2 points to the host machine's localhost.
+      // If you are using a physical Android device, you MUST use the _hostIpAddress.
+      return 'http://10.0.2.2:8000';
+    } else {
+      // For iOS simulators, physical devices, and desktop, use the host's network IP.
+      return 'http://$_hostIpAddress:8000';
+    }
+  }
+  
+  Future<Map<String, dynamic>> sendMessage(String message) async {
+    try {
+      print('🔗 Connecting to: $baseUrl/chat');
+      print('📤 Sending: $message');
+      
+      final response = await http.post(
+        Uri.parse('$baseUrl/chat'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'message': message}),
+      ).timeout(const Duration(seconds: 45)); // Timeout can be shorter now
+      
+      print('📥 Status: ${response.statusCode}');
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print('📥 Response Data (Text-Only): $data');
+        return data; // Will contain { 'response': '...', 'audio_url': null }
+      } else {
+        throw Exception('Server error: ${response.statusCode} ${response.body}');
+      }
+    } catch (e) {
+      print('❌ API Error in sendMessage: $e');
+      return {
+        'response': 'そう...サーバーが応答しないみたい。接続を確認して。',
+        'audio_url': null,
+      };
+    }
+  }
+
+  /// Requests voice synthesis for the given text and returns the full audio URL.
+  Future<String?> synthesizeVoice(String text) async {
+    try {
+      print('🎵 Requesting synthesis from: $baseUrl/synthesize');
+      print('🎵 Text to synthesize: $text');
+      
+      final response = await http.post(
+        Uri.parse('$baseUrl/synthesize'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'text': text}),
+      ).timeout(const Duration(seconds: 45));
+      
+      print('🎵 Synthesis Status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final audioUrl = data['audio_url']; // << MODIFIED: Use the full URL
+        print('🎵 Got audio URL: $audioUrl');
+        return audioUrl;
+      } else {
+        print('❌ Voice synthesis failed with status: ${response.statusCode} ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('❌ Voice synthesis error: $e');
+      return null;
+    }
+  }
+
+  // ヘルスチェック用のメソッド
+  Future<Map<String, dynamic>> checkHealth() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/health'),
+      ).timeout(const Duration(seconds: 10));
+      
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        return {'status': 'error', 'message': 'Health check failed'};
+      }
+    } catch (e) {
+      return {'status': 'error', 'message': 'Connection failed: $e'};
+    }
+  }
+}

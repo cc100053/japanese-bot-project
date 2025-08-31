@@ -1,0 +1,59 @@
+name: japanese_cold_bot
+description: A Japanese learning chat bot with Gal Game style UI
+version: 1.0.0+1
+
+environment:
+  sdk: '^3.9.0'
+  flutter: ">=3.19.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # HTTP 請求
+  http: ^1.2.0
+  
+  # 音頻播放 (Upgrading to latest for low-latency API)
+  just_audio: ^0.10.4
+  rxdart: ^0.27.7
+  
+  # 狀態管理
+  provider: ^6.1.1
+  
+  # 本地存儲
+  shared_preferences: ^2.2.2
+  
+  # 圖片緩存
+  cached_network_image: ^3.3.1
+  
+  # 動畫
+  flutter_animate: ^4.5.0
+  
+  # JSON 序列化
+  json_annotation: ^4.8.1
+  
+  # Material Design Icons
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  json_serializable: ^6.7.1
+  build_runner: ^2.4.7
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/images/ui/
+    - assets/sounds/
+    - assets/fonts/
+
+  fonts:
+    - family: NotoSansJP
+      fonts:
+        - asset: assets/fonts/NotoSansJP-Regular.ttf
+        - asset: assets/fonts/NotoSansJP-Bold.ttf
+          weight: 700
